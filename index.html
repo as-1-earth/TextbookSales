@@ -3,9 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テストページ</title>
+    <title>教科書購入サイト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .total {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h1 style="text-align: center; margin-top: 20%;">OK</h1>
+    <div class="container">
+        <h1>教科書購入</h1>
+        <ul id="textbook-list">
+            <!-- 教科書リストをJavaScriptで生成 -->
+        </ul>
+        <div class="total">合計金額: <span id="total-price">0</span>円</div>
+        <button id="calculate-button">合計を計算</button>
+    </div>
+
+    <script>
+        const textbooks = [
+            { name: '数学Ⅰ', price: 3000 },
+            { name: '数学Ⅱ', price: 3200 },
+            { name: '英語Ⅰ', price: 2500 },
+            { name: '英語Ⅱ', price: 2700 },
+            { name: '化学', price: 3100 },
+            { name: '物理', price: 3300 },
+            { name: '生物', price: 2900 },
+            { name: '地学', price: 2800 },
+            { name: '日本史', price: 2600 },
+            { name: '世界史', price: 2700 },
+            { name: '現代社会', price: 2400 },
+            { name: '古典', price: 2200 },
+            { name: '体育', price: 1800 }
+        ];
+
+        const textbookList = document.getElementById('textbook-list');
+        const totalPriceElement = document.getElementById('total-price');
+        const calculateButton = document.getElementById('calculate-button');
+
+        // 教科書リストを生成
+        textbooks.forEach((textbook, index) => {
+            const listItem = document.createElement('li');
+
+            const label = document.createElement('label');
+            label.textContent = `${textbook.name} (${textbook.price}円)`;
+            label.htmlFor = `textbook-${index}`;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `textbook-${index}`;
+            checkbox.value = textbook.price;
+
+            listItem.appendChild(label);
+            listItem.appendChild(checkbox);
+            textbookList.appendChild(listItem);
+        });
+
+        // 合計金額を計算
+        calculateButton.addEventListener('click', () => {
+            let total = 0;
+            const checkboxes = textbookList.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                total += parseInt(checkbox.value, 10);
+            });
+            totalPriceElement.textContent = total;
+        });
+    </script>
 </body>
 </html>
