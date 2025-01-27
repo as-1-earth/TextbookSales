@@ -19,9 +19,24 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
         }
-        h1 {
+        h1, h2 {
             text-align: center;
             color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         ul {
             list-style: none;
@@ -60,16 +75,37 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="user-info-container">
         <h1>教科書購入</h1>
+        <h2>ユーザー情報入力</h2>
+        <form id="user-form">
+            <label for="year">年:</label>
+            <input type="text" id="year" name="year" required>
+
+            <label for="class">組:</label>
+            <input type="text" id="class" name="class" required>
+
+            <label for="name">名前:</label>
+            <input type="text" id="name" name="name" required>
+
+            <button type="submit">次へ</button>
+        </form>
+    </div>
+
+    <div class="container" id="textbook-container" style="display: none;">
+        <h2>教科書リスト</h2>
         <ul id="textbook-list">
             <!-- 教科書リストをJavaScriptで生成 -->
         </ul>
         <div class="total">合計金額: <span id="total-price">0</span>円</div>
         <button id="calculate-button">合計を計算</button>
+        <button id="check-user-info">保存情報を確認</button>
     </div>
 
     <script>
+        const userForm = document.getElementById('user-form');
+        const userInfoContainer = document.getElementById('user-info-container');
+        const textbookContainer = document.getElementById('textbook-container');
         const textbooks = [
             { name: '数学Ⅰ', price: 3000 },
             { name: '数学Ⅱ', price: 3200 },
@@ -89,23 +125,56 @@
         const textbookList = document.getElementById('textbook-list');
         const totalPriceElement = document.getElementById('total-price');
         const calculateButton = document.getElementById('calculate-button');
+        const checkUserInfoButton = document.getElementById('check-user-info');
+
+        // CSVファイルを取得し、データを格納
+        let csvData = [];
+        fetch('users.csv')
+            .then(response => response.text())
+            .then(data => {
+                csvData = data.split('\n').map(row => row.split(','));
+            })
+            .catch(error => console.error('CSV読み込みエラー:', error));
 
         // 教科書リストを生成
-        textbooks.forEach((textbook, index) => {
-            const listItem = document.createElement('li');
+        function generateTextbookList() {
+            textbookList.innerHTML = '';
+            textbooks.forEach((textbook, index) => {
+                const listItem = document.createElement('li');
 
-            const label = document.createElement('label');
-            label.textContent = `${textbook.name} (${textbook.price}円)`;
-            label.htmlFor = `textbook-${index}`;
+                const label = document.createElement('label');
+                label.textContent = `${textbook.name} (${textbook.price}円)`;
+                label.htmlFor = `textbook-${index}`;
 
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `textbook-${index}`;
-            checkbox.value = textbook.price;
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `textbook-${index}`;
+                checkbox.value = textbook.price;
 
-            listItem.appendChild(label);
-            listItem.appendChild(checkbox);
-            textbookList.appendChild(listItem);
+                listItem.appendChild(label);
+                listItem.appendChild(checkbox);
+                textbookList.appendChild(listItem);
+            });
+        }
+
+        // ユーザー情報を確認して次の画面へ
+        userForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const year = document.getElementById('year').value.trim();
+            const classGroup = document.getElementById('class').value.trim();
+            const name = document.getElementById('name').value.trim();
+
+            const isUserValid = csvData.some(row => row[0] === year && row[1] === classGroup && row[2] === name);
+
+            if (isUserValid) {
+                localStorage.setItem('userInfo', JSON.stringify({ year, classGroup, name }));
+                userInfoContainer.style.display = 'none';
+                textbookContainer.style.display = 'block';
+                generateTextbookList();
+            } else {
+                alert(row[0]+'入力された情報が正しくありません。再度確認してください。');
+            }
         });
 
         // 合計金額を計算
@@ -116,6 +185,22 @@
                 total += parseInt(checkbox.value, 10);
             });
             totalPriceElement.textContent = total;
+        });
+
+        // 保存された情報を確認
+        checkUserInfoButton.addEventListener('click', () => {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (userInfo) {
+                const { year, classGroup, name } = userInfo;
+                if (year === 'x' && classGroup === 'x' && name === 'master') {
+                    alert('保存された教科書情報を確認できます。');
+                    // 必要に応じて、追加の処理を記述
+                } else {
+                    alert(`年: ${year}\n組: ${classGroup}\n名前: ${name}`);
+                }
+            } else {
+                alert('保存された情報がありません。');
+            }
         });
     </script>
 </body>
