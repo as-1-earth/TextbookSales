@@ -1,0 +1,23 @@
+{
+  "name": "textbooksales",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/as-1-earth/TextbookSales.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/as-1-earth/TextbookSales/issues"
+  },
+  "homepage": "https://github.com/as-1-earth/TextbookSales#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
